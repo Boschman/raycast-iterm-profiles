@@ -1,29 +1,16 @@
-import { runAppleScript } from "run-applescript";
-import bplist from "bplist-parser";
+import { runAppleScript } from "@raycast/utils";
+import { parseFile } from "bplist-parser";
 import { homedir } from "os";
 
-const iTermConfigFile = homedir + "/Library/Preferences/com.googlecode.iterm2.plist";
+const iTermConfigFile = homedir() + "/Library/Preferences/com.googlecode.iterm2.plist";
+
+type ITermPreferences = { "New Bookmarks"?: { Name?: string }[] };
 
 const getItermProfiles = async () => {
-  const obj = await bplist.parseFile(iTermConfigFile, (err: Error | null) => {
-    if (null !== err) {
-      console.log(err.message);
-    }
-  });
+  const [preferences] = await parseFile<ITermPreferences>(iTermConfigFile);
+  const bookmarks = preferences["New Bookmarks"] ?? [];
 
-  const bookmarks = obj[0]["New Bookmarks"];
-
-  const profiles = [];
-
-  for (let i = 0; i < bookmarks.length; i++) {
-    if (bookmarks[i].Name) {
-      profiles.push({
-        name: bookmarks[i].Name,
-      });
-    }
-  }
-
-  return profiles;
+  return bookmarks.filter((bookmark) => bookmark.Name).map((bookmark) => ({ name: bookmark.Name as string }));
 };
 
 const openProfile = (profileName: string) => runAppleScript(appleScriptToOpenProfile(profileName));

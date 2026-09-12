@@ -20,20 +20,15 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.48.5",
-    "@raycast/utils": "^1.5.2",
-    "bplist-parser": "^0.3.2",
-    "run-applescript": "^6.1.0"
+    "@raycast/api": "^2.3.1",
+    "@raycast/utils": "^2.3.1",
+    "bplist-parser": "^0.5.0"
   },
   "devDependencies": {
-    "@types/node": "^24.13.4",
-    "@types/react": "18.0.9",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "prettier": "^2.5.1",
-    "typescript": "^5.9.3"
+    "@raycast/eslint-config": "^2.2.0",
+    "eslint": "^10.10.0",
+    "prettier": "^3.9.6",
+    "typescript": "^6.0.3"
   },
   "engines": {
     "node": ">=24"
