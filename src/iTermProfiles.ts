@@ -3,6 +3,7 @@ import { parseFile } from "bplist-parser";
 import { homedir } from "os";
 
 const iTermConfigFile = homedir() + "/Library/Preferences/com.googlecode.iterm2.plist";
+const iTermBundleId = "com.googlecode.iterm2";
 
 type ITermPreferences = { "New Bookmarks"?: { Name?: string }[] };
 
@@ -15,39 +16,33 @@ const getItermProfiles = async () => {
 
 const openProfile = (profileName: string) => runAppleScript(appleScriptToOpenProfile(profileName));
 
-const appleScriptToOpenProfile = (profileName: string) =>
-  `
-    tell application "iTerm"
+const toAppleScriptString = (value: string) => `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+
+// On a cold start iTerm opens its startup window asynchronously, so wait for it before replacing it.
+// Without iTerm windows there is no current window, so create one instead of a tab.
+const appleScriptToOpenProfile = (profileName: string) => {
+  const profile = toAppleScriptString(profileName);
+
+  return `
+    set wasRunning to application id "${iTermBundleId}" is running
+
+    tell application id "${iTermBundleId}"
         activate
-        
-        set isRunning to (count of windows) > 0
 
-        if not (isRunning) then
-            delay 0.5
-            close the current window
-            create window with profile "` +
-  profileName +
-  `"
+        if not wasRunning then
+            repeat 30 times
+                if (count of windows) > 0 then exit repeat
+                delay 0.1
+            end repeat
+            if (count of windows) > 0 then close first window
         end if
 
-        set hasNoWindows to ((count of windows) is 0)
-        if isRunning and hasNoWindows then
-            delay 0.5
-            close the current window
-            create window with profile "` +
-  profileName +
-  `"
+        if current window is missing value then
+            create window with profile ${profile}
+        else
+            tell current window to create tab with profile ${profile}
         end if
-
-        select first window
-
-        tell the first window
-            if isRunning and hasNoWindows is false then
-                create tab with profile "` +
-  profileName +
-  `"
-            end if
-        end tell
     end tell`;
+};
 
 export { getItermProfiles, openProfile };
