@@ -20,14 +20,14 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^2.3.1",
-    "@raycast/utils": "^2.3.1",
+    "@raycast/api": "^2.5.3",
+    "@raycast/utils": "^2.3.2",
     "bplist-parser": "^0.5.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^2.2.0",
-    "eslint": "^10.10.0",
-    "prettier": "^3.9.6",
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
     "typescript": "^6.0.3"
   },
   "engines": {
