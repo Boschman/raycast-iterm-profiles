@@ -1,20 +1,22 @@
-import { Action, ActionPanel, closeMainWindow, List, popToRoot, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, closeMainWindow, List, popToRoot, PopToRootType, showToast, Toast } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { getItermProfiles, openProfile } from "./iTermProfiles";
 
-const openProfileAction = (profileName: string) => {
-  openProfile(profileName)
-    .then(async () => {
-      await closeMainWindow();
-      await popToRoot();
-    })
-    .catch(async (e) => {
-      await showToast({
-        style: Toast.Style.Failure,
-        title: "Error opening iTerm Profile",
-        message: e.message,
-      });
+const openProfileAction = async (profileName: string) => {
+  try {
+    // iTerm taking focus closes the Raycast window, which pops to root and unloads the command
+    // mid-script. Close the window first and suspend pop to root until the script is done.
+    await closeMainWindow({ popToRootType: PopToRootType.Suspended });
+    await openProfile(profileName);
+  } catch (e: unknown) {
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Error opening iTerm Profile",
+      message: (e as Error).message,
     });
+  } finally {
+    await popToRoot();
+  }
 };
 
 const getProfiles = async () => {

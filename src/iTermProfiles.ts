@@ -20,6 +20,7 @@ const toAppleScriptString = (value: string) => `"${value.replace(/\\/g, "\\\\").
 
 // On a cold start iTerm opens its startup window asynchronously, so wait for it before replacing it.
 // Without iTerm windows there is no current window, so create one instead of a tab.
+// Activate last, so the profile is already open by the time iTerm takes focus.
 const appleScriptToOpenProfile = (profileName: string) => {
   const profile = toAppleScriptString(profileName);
 
@@ -27,9 +28,8 @@ const appleScriptToOpenProfile = (profileName: string) => {
     set wasRunning to application id "${iTermBundleId}" is running
 
     tell application id "${iTermBundleId}"
-        activate
-
         if not wasRunning then
+            activate
             repeat 30 times
                 if (count of windows) > 0 then exit repeat
                 delay 0.1
@@ -42,6 +42,8 @@ const appleScriptToOpenProfile = (profileName: string) => {
         else
             tell current window to create tab with profile ${profile}
         end if
+
+        activate
     end tell`;
 };
 
